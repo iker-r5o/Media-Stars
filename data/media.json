@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "type": "movie",
+    "title": "The Shawshank Redemption",
+    "year": 1994,
+    "length": 142,
+    "genre": "Drama",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg"
+  },
+  {
+    "id": 2,
+    "type": "movie",
+    "title": "Inception",
+    "year": 2010,
+    "length": 148,
+    "genre": "Sci-Fi",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_%282010%29_theatrical_poster.jpg"
+  },
+  {
+    "id": 3,
+    "type": "movie",
+    "title": "Finding Nemo",
+    "year": 2003,
+    "length": 100,
+    "genre": "Animation",
+    "rating": 4,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/2/29/Finding_Nemo.jpg"
+  },
+  {
+    "id": 4,
+    "type": "tv",
+    "title": "Breaking Bad",
+    "year": 2008,
+    "seasons": 5,
+    "genre": "Crime",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/6/61/Breaking_Bad_title_card.png"
+  },
+  {
+    "id": 5,
+    "type": "tv",
+    "title": "The Office",
+    "year": 2005,
+    "seasons": 9,
+    "genre": "Comedy",
+    "rating": 4,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/0/0b/The_Office_US.jpg"
+  },
+  {
+    "id": 6,
+    "type": "tv",
+    "title": "Stranger Things",
+    "year": 2016,
+    "seasons": 4,
+    "genre": "Sci-Fi",
+    "rating": 4,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/7/73/Stranger_Things_title_card.png"
+  },
+  {
+    "id": 7,
+    "type": "song",
+    "title": "Bohemian Rhapsody",
+    "year": 1975,
+    "length": 6,
+    "genre": "Rock",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/9/9f/Bohemian_Rhapsody.png"
+  },
+  {
+    "id": 8,
+    "type": "song",
+    "title": "Billie Jean",
+    "year": 1982,
+    "length": 5,
+    "genre": "Pop",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/4/4f/Michael_Jackson_-_Thriller.png"
+  },
+  {
+    "id": 9,
+    "type": "song",
+    "title": "Hey Jude",
+    "year": 1968,
+    "length": 7,
+    "genre": "Rock",
+    "rating": 5,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/0/0a/Hey_Jude.jpg"
+  }
+]

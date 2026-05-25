@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Stars</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Media Stars</h1>
+        <p>Your movies, TV shows, and songs in one place.</p>
+    </header>
+
+    <main>
+
+        <section class="add-section">
+            <h2>Add something new</h2>
+
+            <form id="add-form">
+                <label>
+                    Type
+                    <select id="type" name="type">
+                        <option value="movie">Movie</option>
+                        <option value="tv">TV Show</option>
+                        <option value="song">Song</option>
+                    </select>
+                </label>
+
+                <label>
+                    Title
+                    <input type="text" id="title" name="title">
+                </label>
+
+                <label>
+                    Year
+                    <input type="number" id="year" name="year" min="1900" max="2100">
+                </label>
+
+                <label id="length-label">
+                    <span id="length-text">Length (minutes)</span>
+                    <input type="number" id="length" name="length" min="1">
+                </label>
+
+                <label id="seasons-label" class="hidden">
+                    <span>Number of seasons</span>
+                    <input type="number" id="seasons" name="seasons" min="1">
+                </label>
+
+                <label>
+                    Genre
+                    <input type="text" id="genre" name="genre">
+                </label>
+
+                <label>
+                    Rating (1-5)
+                    <select id="rating" name="rating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </label>
+
+                <label id="poster-label">
+                    <span id="poster-text">Poster URL</span>
+                    <input type="text" id="poster" name="poster" placeholder="https://...">
+                </label>
+
+                <p id="form-error" class="error-msg"></p>
+
+                <button type="submit">Add to library</button>
+            </form>
+        </section>
+
+        <section class="catalog-section">
+            <h2>Your library</h2>
+
+            <div class="filter-tabs">
+                <button type="button" class="tab active" data-filter="all">All</button>
+                <button type="button" class="tab" data-filter="movie">Movies</button>
+                <button type="button" class="tab" data-filter="tv">TV Shows</button>
+                <button type="button" class="tab" data-filter="song">Songs</button>
+            </div>
+
+            <div id="catalog" class="catalog-grid">
+                <!-- cards go here -->
+            </div>
+
+            <p id="empty-msg" class="empty-msg hidden">Nothing here yet. Add something above!</p>
+        </section>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

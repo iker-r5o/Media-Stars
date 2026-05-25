@@ -1,0 +1,187 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background-color: #1a1a2e;
+    color: #eee;
+}
+
+header {
+    background-color: #16213e;
+    padding: 20px 30px;
+    border-bottom: 3px solid #e94560;
+}
+
+header h1 {
+    margin: 0 0 5px 0;
+    color: #e94560;
+}
+
+header p {
+    margin: 0;
+    color: #aaa;
+}
+
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+h2 {
+    color: #e94560;
+    margin-top: 0;
+}
+
+/* add form */
+
+.add-section {
+    background-color: #16213e;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+#add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+#add-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #ccc;
+}
+
+#add-form input,
+#add-form select {
+    margin-top: 4px;
+    padding: 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #0f3460;
+    color: #fff;
+}
+
+#add-form button[type="submit"] {
+    grid-column: 1 / -1;
+    padding: 10px;
+    background-color: #e94560;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#add-form button[type="submit"]:hover {
+    background-color: #c73a52;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.error-msg {
+    color: #ff6b6b;
+    margin: 0;
+    grid-column: 1 / -1;
+}
+
+/* filter tabs */
+
+.filter-tabs {
+    margin-bottom: 15px;
+}
+
+.tab {
+    padding: 8px 14px;
+    margin-right: 6px;
+    background-color: #0f3460;
+    color: #eee;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tab.active {
+    background-color: #e94560;
+    border-color: #e94560;
+}
+
+/* catalog cards */
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 18px;
+}
+
+.card {
+    background-color: #16213e;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.card img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+    background-color: #333;
+}
+
+.card-body {
+    padding: 12px;
+}
+
+.card-body h3 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+}
+
+.card-type {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #e94560;
+    margin-bottom: 6px;
+}
+
+.card-info {
+    font-size: 13px;
+    color: #aaa;
+    margin: 3px 0;
+}
+
+.stars {
+    color: #ffd700;
+    font-size: 14px;
+    margin: 6px 0;
+}
+
+.delete-btn {
+    width: 100%;
+    padding: 7px;
+    margin-top: 8px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #e94560;
+}
+
+.empty-msg {
+    color: #888;
+    text-align: center;
+    padding: 30px;
+}
