@@ -187,7 +187,9 @@ function isHttpUrl(url) {
     }
 }
 
+//this has the current items
 function renderItems() {
+    //cleans everything and rerenders it first
     elements.catalog.replaceChildren();
 
     const filteredItems = state.items.filter((item) => {
@@ -202,6 +204,7 @@ function renderItems() {
     });
 }
 
+//this will make the card/icon for each added item
 function makeCard(item) {
     const card = document.createElement('article');
     card.className = 'card';
@@ -246,6 +249,7 @@ function makeCard(item) {
     return card;
 }
 
+//this is what has the rating option for each piece of media
 function makeRateForm(item) {
     const form = document.createElement('form');
     form.className = 'rate-form';
@@ -284,6 +288,7 @@ function makeRateForm(item) {
     return form;
 }
 
+//this sends the rating to the databse
 async function rateItem(id, rating) {
     try {
         const result = await apiRequest('php/rate.php', {
@@ -300,7 +305,7 @@ async function rateItem(id, rating) {
         alert(error.message || 'Could not save rating.');
     }
 }
-
+//this will remove it from the library
 async function deleteItem(id) {
     if (!confirm('Remove this item from your library?')) {
         return;
@@ -318,7 +323,7 @@ async function deleteItem(id) {
         alert(error.message || 'Could not delete item.');
     }
 }
-
+//this is what has the helper functions so we can interact with the backend
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
@@ -340,6 +345,7 @@ async function apiRequest(url, options = {}) {
     return data;
 }
 
+//the helper function to make the text
 function makeText(tag, text, className = '') {
     const element = document.createElement(tag);
     element.textContent = text;
@@ -348,7 +354,7 @@ function makeText(tag, text, className = '') {
     }
     return element;
 }
-
+//makes the label pretty :)
 function typeLabel(type) {
     if (type === 'tv') {
         return 'TV Show';
@@ -367,7 +373,7 @@ function detailText(item) {
 
     return `${item.pages} pages`;
 }
-
+//makes the avg rating 
 function getAverageRating(item) {
     const ratings = Array.isArray(item.ratings) ? item.ratings : [];
     if (ratings.length === 0) {
