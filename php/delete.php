@@ -1,36 +1,27 @@
 <?php
-header('Content-Type: application/json');
-
 require_once 'helpers.php';
 
-$body = file_get_contents('php://input');
-$data = json_decode($body, true);
-
-$id = (int) ($data['id'] ?? 0);
-
-if ($id <= 0) {
-    echo json_encode(['ok' => false, 'error' => 'Invalid id']);
-    exit;
-}
+requireMethod('POST');
+$data = readJsonBody();
+$id = cleanInt($data, 'id', 1, PHP_INT_MAX);
 
 $items = getAllItems();
-$newList = [];
+$updatedItems = [];
 $found = false;
 
 foreach ($items as $item) {
-    if ($item['id'] === $id) {
+    if ((int) ($item['id'] ?? 0) === $id) {
         $found = true;
-    } else {
-        $newList[] = $item;
+        continue;
     }
+
+    $updatedItems[] = $item;
 }
 
 if (!$found) {
-    echo json_encode(['ok' => false, 'error' => 'Item not found']);
-    exit;
+    sendJson(['ok' => false, 'error' => 'Item not found'], 404);
 }
 
-saveAllItems($newList);
-echo json_encode(['ok' => true]);
-
+saveAllItems($updatedItems);
+sendJson(['ok' => true]);
 ?>

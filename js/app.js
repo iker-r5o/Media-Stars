@@ -1,275 +1,401 @@
-// Media Stars - main javascript file
+// Media Stars - no-framework front-end JavaScript
 
-var allItems = [];
-var currentFilter = 'all';
+const state = {
+    items: [],
+    currentFilter: 'all'
+};
 
-// when page loads, get items from server
-document.addEventListener('DOMContentLoaded', function () {
-    loadItems();
+const elements = {};
 
-    document.getElementById('add-form').addEventListener('submit', handleAdd);
-    document.getElementById('type').addEventListener('change', updateFormFields);
+document.addEventListener('DOMContentLoaded', () => {
+    /* connects elements to the DOM */
+    elements.form = document.getElementById('add-form');
+    elements.type = document.getElementById('type');
+    elements.title = document.getElementById('title');
+    elements.year = document.getElementById('year');
+    elements.length = document.getElementById('length');
+    elements.seasons = document.getElementById('seasons');
+    elements.pages = document.getElementById('pages');
+    elements.genre = document.getElementById('genre');
+    elements.rating = document.getElementById('rating');
+    elements.ratingOutput = document.getElementById('rating-output');
+    elements.imageUrl = document.getElementById('image_url');
+    elements.imageText = document.getElementById('image-text');
+    elements.formError = document.getElementById('form-error');
+    elements.catalog = document.getElementById('catalog');
+    elements.emptyMsg = document.getElementById('empty-msg');
+    elements.itemCount = document.getElementById('item-count');
 
-    var tabs = document.querySelectorAll('.tab');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].addEventListener('click', handleTabClick);
-    }
+    /* adds event listeners to some of the elements */
+    elements.form.addEventListener('submit', handleAdd);
+    elements.type.addEventListener('change', updateFormFields);
+    elements.rating.addEventListener('input', () => {
+        elements.ratingOutput.textContent = elements.rating.value;
+    });
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', handleTabClick);
+    });
 
     updateFormFields();
+    loadItems();
 });
 
+/* updates the form fields based on the type of media */
 function updateFormFields() {
-    var type = document.getElementById('type').value;
-    var lengthLabel = document.getElementById('length-label');
-    var seasonsLabel = document.getElementById('seasons-label');
-    if (type === 'tv') {
-        lengthLabel.classList.add('hidden');
-        seasonsLabel.classList.remove('hidden');
-        document.getElementById('poster-text').textContent = 'Poster URL';
-    } else if (type === 'song') {
-        lengthLabel.classList.remove('hidden');
-        seasonsLabel.classList.add('hidden');
-        document.getElementById('length-text').textContent = 'Length (minutes)';
-        document.getElementById('poster-text').textContent = 'Album art URL';
-    } else {
-        lengthLabel.classList.remove('hidden');
-        seasonsLabel.classList.add('hidden');
-        document.getElementById('length-text').textContent = 'Length (minutes)';
-        document.getElementById('poster-text').textContent = 'Poster URL';
+    /* set variables */
+    const type = elements.type.value;
+    const lengthLabel = document.getElementById('length-label');
+    const seasonsLabel = document.getElementById('seasons-label');
+    const pagesLabel = document.getElementById('pages-label');
+
+    /* toggle hides the label if type is not movie, tv, or book */
+    lengthLabel.classList.toggle('hidden', type !== 'movie');
+    seasonsLabel.classList.toggle('hidden', type !== 'tv');
+    pagesLabel.classList.toggle('hidden', type !== 'book');
+
+    elements.imageText.textContent = type === 'book' ? 'Cover URL' : 'Poster URL';
+}
+
+/* makes the website accessible to keyboard users by setting up tab navigation */
+function handleTabClick(event) {
+    state.currentFilter = event.currentTarget.dataset.filter;
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+        tab.classList.toggle('active', tab.dataset.filter === state.currentFilter);
+    });
+
+    renderItems();
+}
+
+/* loads the items from the server */
+async function loadItems() {
+    try {
+        const data = await apiRequest('php/list.php');
+        state.items = Array.isArray(data) ? data : [];
+        renderItems();
+    } catch (error) {
+        showCatalogError(error.message || 'Could not load items. Is PHP running?');
     }
 }
 
-function handleTabClick(e) {
-    currentFilter = e.target.getAttribute('data-filter');
+/* handles the addition of new media */
+async function handleAdd(event) {
+    event.preventDefault();
+    clearFormError();
 
-    var tabs = document.querySelectorAll('.tab');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].classList.remove('active');
-    }
-    e.target.classList.add('active');
+    /* reads the form and validates the input */
+    const newItem = readForm();
+    const error = validateItem(newItem);
 
-    showItems();
-}
-
-function loadItems() {
-    fetch('php/list.php')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            allItems = data;
-            showItems();
-        })
-        .catch(function () {
-            document.getElementById('catalog').innerHTML = '<p class="error-msg">Could not load items. Is PHP running?</p>';
-        });
-}
-
-function showItems() {
-    var catalog = document.getElementById('catalog');
-    var emptyMsg = document.getElementById('empty-msg');
-    catalog.innerHTML = '';
-
-    var toShow = [];
-    for (var i = 0; i < allItems.length; i++) {
-        if (currentFilter === 'all' || allItems[i].type === currentFilter) {
-            toShow.push(allItems[i]);
-        }
-    }
-
-    if (toShow.length === 0) {
-        emptyMsg.classList.remove('hidden');
+    if (error) {
+        showFormError(error);
         return;
     }
 
-    emptyMsg.classList.add('hidden');
+    try {
+        /* sends the new media to the server */
+        const result = await apiRequest('php/add.php', {
+            method: 'POST',
+            body: JSON.stringify(newItem)
+        });
 
-    for (var j = 0; j < toShow.length; j++) {
-        catalog.appendChild(makeCard(toShow[j]));
+        state.items.push(result.item);
+        elements.form.reset();
+        elements.rating.value = 3;
+        elements.ratingOutput.textContent = '3';
+        updateFormFields();
+        renderItems();
+    } catch (error) {
+        /* shows an error message if it is returned */
+        showFormError(error.message || 'Could not add item.');
     }
+}
+
+function readForm() {
+    /* reads the form and validates the input */
+    const type = elements.type.value;
+    /* creates a new item object */
+    const item = {
+        type,
+        title: elements.title.value.trim(),
+        year: Number(elements.year.value),
+        genre: elements.genre.value.trim(),
+        rating: Number(elements.rating.value),
+        image_url: elements.imageUrl.value.trim()
+    };
+
+    if (type === 'movie') {
+        item.length = Number(elements.length.value);
+    } else if (type === 'tv') {
+        item.seasons = Number(elements.seasons.value);
+    } else if (type === 'book') {
+        item.pages = Number(elements.pages.value);
+    }
+
+    return item;
+}
+
+/* makes sure there are no errors with the item */
+function validateItem(item) {
+    if (!['movie', 'tv', 'book'].includes(item.type)) {
+        return 'Please choose a valid type.';
+    }
+
+    if (item.title.length < 1 || item.title.length > 80) {
+        return 'Please enter a title between 1 and 80 characters.';
+    }
+
+    if (!Number.isInteger(item.year) || item.year < 1000 || item.year > 2100) {
+        return 'Please enter a valid year between 1000 and 2100.';
+    }
+
+    if (item.genre.length < 1 || item.genre.length > 40) {
+        return 'Please enter a genre between 1 and 40 characters.';
+    }
+
+    if (!Number.isInteger(item.rating) || item.rating < 1 || item.rating > 5) {
+        return 'Please choose a rating from 1 to 5.';
+    }
+
+    if (!isHttpUrl(item.image_url)) {
+        return 'Image URL must start with http:// or https://.';
+    }
+
+    if (item.type === 'movie' && (!Number.isInteger(item.length) || item.length < 1 || item.length > 600)) {
+        return 'Movie length must be between 1 and 600 minutes.';
+    }
+
+    if (item.type === 'tv' && (!Number.isInteger(item.seasons) || item.seasons < 1 || item.seasons > 100)) {
+        return 'TV seasons must be between 1 and 100.';
+    }
+
+    if (item.type === 'book' && (!Number.isInteger(item.pages) || item.pages < 1 || item.pages > 10000)) {
+        return 'Book pages must be between 1 and 10,000.';
+    }
+
+    return '';
+}
+
+/* makes sure the url is working */
+function isHttpUrl(url) {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (_error) {
+        return false;
+    }
+}
+
+function renderItems() {
+    elements.catalog.replaceChildren();
+
+    const filteredItems = state.items.filter((item) => {
+        return state.currentFilter === 'all' || item.type === state.currentFilter;
+    });
+
+    elements.emptyMsg.classList.toggle('hidden', filteredItems.length > 0);
+    elements.itemCount.textContent = `${filteredItems.length} item${filteredItems.length === 1 ? '' : 's'} shown`;
+
+    filteredItems.forEach((item) => {
+        elements.catalog.appendChild(makeCard(item));
+    });
 }
 
 function makeCard(item) {
-    var card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'card';
-    card.setAttribute('data-id', item.id);
+    card.dataset.id = String(item.id);
 
-    var typeName = item.type;
-    if (typeName === 'tv') {
-        typeName = 'TV Show';
-    } else if (typeName === 'song') {
-        typeName = 'Song';
-    } else {
-        typeName = 'Movie';
-    }
+    const posterWrap = document.createElement('div');
+    posterWrap.className = 'poster-wrap';
 
-    var extraInfo = '';
-    if (item.type === 'movie' || item.type === 'song') {
-        extraInfo = '<p class="card-info">' + item.length + ' min</p>';
-    }
-    if (item.type === 'tv') {
-        extraInfo = '<p class="card-info">' + item.seasons + ' seasons</p>';
-    }
+    const image = document.createElement('img');
+    image.src = item.image_url;
+    image.alt = `${item.title} ${item.type === 'book' ? 'cover' : 'poster'}`;
+    image.loading = 'lazy';
+    image.addEventListener('error', () => {
+        image.remove();
+        posterWrap.textContent = 'Image unavailable';
+        posterWrap.classList.add('empty-msg');
+    }, { once: true });
+    posterWrap.appendChild(image);
 
-    var stars = '';
-    for (var s = 0; s < item.rating; s++) {
-        stars = stars + '★';
-    }
-    for (var e = item.rating; e < 5; e++) {
-        stars = stars + '☆';
-    }
+    const body = document.createElement('div');
+    body.className = 'card-body';
 
-    card.innerHTML =
-        '<img src="' + item.poster + '" alt="' + item.title + '">' +
-        '<div class="card-body">' +
-        '<p class="card-type">' + typeName + '</p>' +
-        '<h3>' + item.title + '</h3>' +
-        '<p class="card-info">' + item.year + ' · ' + item.genre + '</p>' +
-        extraInfo +
-        '<p class="stars">' + stars + '</p>' +
-        '<button type="button" class="delete-btn">Remove</button>' +
-        '</div>';
+    body.appendChild(makeText('p', typeLabel(item.type), 'card-type'));
+    body.appendChild(makeText('h3', item.title));
+    body.appendChild(makeText('p', `${item.year} · ${item.genre}`, 'card-info'));
+    body.appendChild(makeText('p', detailText(item), 'card-info'));
 
-    card.querySelector('.delete-btn').addEventListener('click', function () {
-        deleteItem(item.id);
-    });
+    const average = getAverageRating(item);
+    body.appendChild(makeText('p', starString(average), 'stars'));
+    body.appendChild(makeText('p', `Average: ${average.toFixed(1)} / 5 (${ratingCount(item)} rating${ratingCount(item) === 1 ? '' : 's'})`, 'rating-summary'));
+    body.appendChild(makeRateForm(item));
 
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'delete-btn';
+    deleteButton.textContent = 'Remove';
+    deleteButton.addEventListener('click', () => deleteItem(item.id));
+    body.appendChild(deleteButton);
+
+    card.appendChild(posterWrap);
+    card.appendChild(body);
     return card;
 }
 
-function validateForm() {
-    var errorBox = document.getElementById('form-error');
-    errorBox.textContent = '';
+function makeRateForm(item) {
+    const form = document.createElement('form');
+    form.className = 'rate-form';
 
-    var type = document.getElementById('type').value;
-    var title = document.getElementById('title').value.trim();
-    var year = document.getElementById('year').value;
-    var genre = document.getElementById('genre').value.trim();
-    var rating = document.getElementById('rating').value;
-    var poster = document.getElementById('poster').value.trim();
+    const label = document.createElement('label');
+    label.textContent = 'Leave a rating';
 
-    if (title === '') {
-        errorBox.textContent = 'Please enter a title.';
-        return false;
-    }
+    const select = document.createElement('select');
+    select.name = 'rating';
 
-    if (year === '' || year < 1900 || year > 2100) {
-        errorBox.textContent = 'Please enter a valid year (1900-2100).';
-        return false;
-    }
-
-    if (genre === '') {
-        errorBox.textContent = 'Please enter a genre.';
-        return false;
-    }
-
-    if (poster === '') {
-        errorBox.textContent = 'Please enter an image URL.';
-        return false;
-    }
-
-    if (!poster.startsWith('http://') && !poster.startsWith('https://')) {
-        errorBox.textContent = 'Image URL should start with http:// or https://';
-        return false;
-    }
-
-    if (type === 'movie' || type === 'song') {
-        var length = document.getElementById('length').value;
-        if (length === '' || length < 1) {
-            errorBox.textContent = 'Please enter length in minutes (at least 1).';
-            return false;
+    for (let value = 1; value <= 5; value += 1) {
+        const option = document.createElement('option');
+        option.value = String(value);
+        option.textContent = String(value);
+        if (value === 5) {
+            option.selected = true;
         }
+        select.appendChild(option);
     }
 
-    if (type === 'tv') {
-        var seasons = document.getElementById('seasons').value;
-        if (seasons === '' || seasons < 1) {
-            errorBox.textContent = 'Please enter number of seasons (at least 1).';
-            return false;
-        }
-    }
+    label.appendChild(select);
 
-    return true;
+    const button = document.createElement('button');
+    button.type = 'submit';
+    button.className = 'secondary-btn';
+    button.textContent = 'Rate';
+
+    form.appendChild(label);
+    form.appendChild(button);
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await rateItem(item.id, Number(select.value));
+    });
+
+    return form;
 }
 
-function handleAdd(e) {
-    e.preventDefault();
-
-    if (!validateForm()) {
-        return;
-    }
-
-    var type = document.getElementById('type').value;
-
-    var newItem = {
-        type: type,
-        title: document.getElementById('title').value.trim(),
-        year: parseInt(document.getElementById('year').value, 10),
-        genre: document.getElementById('genre').value.trim(),
-        rating: parseInt(document.getElementById('rating').value, 10),
-        poster: document.getElementById('poster').value.trim()
-    };
-
-    if (type === 'movie' || type === 'song') {
-        newItem.length = parseInt(document.getElementById('length').value, 10);
-    }
-
-    if (type === 'tv') {
-        newItem.seasons = parseInt(document.getElementById('seasons').value, 10);
-    }
-
-    fetch('php/add.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newItem)
-    })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (result) {
-            if (result.ok) {
-                allItems.push(result.item);
-                showItems();
-                document.getElementById('add-form').reset();
-                document.getElementById('form-error').textContent = '';
-                updateFormFields();
-            } else {
-                document.getElementById('form-error').textContent = result.error || 'Could not add item.';
-            }
-        })
-        .catch(function () {
-            document.getElementById('form-error').textContent = 'Server error. Is PHP running?';
+async function rateItem(id, rating) {
+    try {
+        const result = await apiRequest('php/rate.php', {
+            method: 'POST',
+            body: JSON.stringify({ id, rating })
         });
+
+        state.items = state.items.map((item) => {
+            return item.id === id ? result.item : item;
+        });
+
+        renderItems();
+    } catch (error) {
+        alert(error.message || 'Could not save rating.');
+    }
 }
 
-function deleteItem(id) {
+async function deleteItem(id) {
     if (!confirm('Remove this item from your library?')) {
         return;
     }
 
-    fetch('php/delete.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id })
-    })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (result) {
-            if (result.ok) {
-                var updated = [];
-                for (var i = 0; i < allItems.length; i++) {
-                    if (allItems[i].id !== id) {
-                        updated.push(allItems[i]);
-                    }
-                }
-                allItems = updated;
-                showItems();
-            } else {
-                alert(result.error || 'Could not delete.');
-            }
-        })
-        .catch(function () {
-            alert('Server error. Is PHP running?');
+    try {
+        await apiRequest('php/delete.php', {
+            method: 'POST',
+            body: JSON.stringify({ id })
         });
+
+        state.items = state.items.filter((item) => item.id !== id);
+        renderItems();
+    } catch (error) {
+        alert(error.message || 'Could not delete item.');
+    }
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+    });
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch (_error) {
+        throw new Error('Server returned invalid JSON.');
+    }
+
+    if (!response.ok || data.ok === false) {
+        throw new Error(data.error || 'Request failed.');
+    }
+
+    return data;
+}
+
+function makeText(tag, text, className = '') {
+    const element = document.createElement(tag);
+    element.textContent = text;
+    if (className) {
+        element.className = className;
+    }
+    return element;
+}
+
+function typeLabel(type) {
+    if (type === 'tv') {
+        return 'TV Show';
+    }
+    return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
+function detailText(item) {
+    if (item.type === 'movie') {
+        return `${item.length} minutes`;
+    }
+
+    if (item.type === 'tv') {
+        return `${item.seasons} season${item.seasons === 1 ? '' : 's'}`;
+    }
+
+    return `${item.pages} pages`;
+}
+
+function getAverageRating(item) {
+    const ratings = Array.isArray(item.ratings) ? item.ratings : [];
+    if (ratings.length === 0) {
+        return 0;
+    }
+
+    const total = ratings.reduce((sum, rating) => sum + Number(rating), 0);
+    return total / ratings.length;
+}
+
+function ratingCount(item) {
+    return Array.isArray(item.ratings) ? item.ratings.length : 0;
+}
+
+function starString(average) {
+    const rounded = Math.round(average);
+    return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+}
+
+function clearFormError() {
+    elements.formError.textContent = '';
+}
+
+function showFormError(message) {
+    elements.formError.textContent = message;
+}
+
+function showCatalogError(message) {
+    elements.catalog.replaceChildren(makeText('p', message, 'error-msg'));
+    elements.itemCount.textContent = 'Unable to load items';
 }

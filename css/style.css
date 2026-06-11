@@ -2,85 +2,202 @@
     box-sizing: border-box;
 }
 
+/* here is where we set the primary colors for the website */
+:root {
+    --bg: #111827;
+    --panel: #172033;
+    --panel-light: #1f2a44;
+    --text: #f5f7fb;
+    --muted: #aeb7cb;
+    --accent: #ff4f75;
+    --accent-dark: #d93c5e;
+    --border: #31405f;
+    --danger: #ff8a8a;
+    --gold: #ffd166;
+}
+
+/* set the font for the website, makes it more uniform */
+/* want to margin between the boarders of the page and the main content */
 body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    background-color: #1a1a2e;
-    color: #eee;
+    background: radial-gradient(circle at top left, #233052, var(--bg) 45%);
+    color: var(--text);
+    /* vh makes it compared to the height of the page. 100 is whole page */
+    min-height: 100vh;
 }
 
-header {
-    background-color: #16213e;
-    padding: 20px 30px;
-    border-bottom: 3px solid #e94560;
+/* site header is the top of the page */
+.site-header {
+    padding: 34px 30px;
+    border-bottom: 3px solid var(--accent);
+    background-color: rgba(23, 32, 51, 0.92);
 }
 
-header h1 {
-    margin: 0 0 5px 0;
-    color: #e94560;
-}
-
-header p {
-    margin: 0;
-    color: #aaa;
-}
-
+.site-header div,
 main {
-    max-width: 1100px;
+    max-width: 1120px;
     margin: 0 auto;
-    padding: 25px;
 }
 
-h2 {
-    color: #e94560;
+/* in css, commas allow us to select multiple things at once */
+h1,
+h2,
+h3,
+p {
     margin-top: 0;
 }
 
-/* add form */
+h1 {
+    margin-bottom: 6px;
+    color: var(--accent);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+}
 
+h2 {
+    color: var(--accent);
+    margin-bottom: 0;
+}
+
+/* this is the paragraph text in the header */
+.site-header p {
+    color: var(--muted);
+    margin-bottom: 0;
+}
+
+main {
+    padding: 26px;
+}
+
+/* this panel contains the main content */
+.panel {
+    background-color: rgba(23, 32, 51, 0.94);
+    border: 1px solid var(--border);
+    /*makes corners rounded*/
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+}
+
+/* section to add new media */
 .add-section {
-    background-color: #16213e;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
+}
+
+/* section heading is the title of the section */
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+/* text below the title */
+.eyebrow {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    margin-bottom: 4px;
+}
+
+/* below the input fields */
+.hint {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 0;
 }
 
 #add-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    /* creates two columns for the input fields */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
 }
 
-#add-form label {
+#add-form label,
+.rate-form label {
+    /* flex allows us to align divs as columns */
     display: flex;
     flex-direction: column;
-    font-size: 14px;
-    color: #ccc;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.9rem;
 }
 
+/* input fields for the add form */
 #add-form input,
-#add-form select {
-    margin-top: 4px;
-    padding: 8px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    background-color: #0f3460;
-    color: #fff;
-}
-
-#add-form button[type="submit"] {
-    grid-column: 1 / -1;
+#add-form select,
+.rate-form select {
     padding: 10px;
-    background-color: #e94560;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--panel-light);
+    color: var(--text);
+    font: inherit;
 }
 
-#add-form button[type="submit"]:hover {
-    background-color: #c73a52;
+/* focus: outline when the input field is focused */
+#add-form input:focus,
+#add-form select:focus,
+.rate-form select:focus,
+button:focus-visible {
+    outline: 3px solid rgba(255, 79, 117, 0.35);
+    outline-offset: 2px;
+}
+
+/* the row with the range input */
+.range-row {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    gap: 10px;
+    align-items: center;
+}
+
+/* range input is the slider */
+input[type="range"] {
+    accent-color: var(--accent);
+}
+
+/* buttons */
+.primary-btn,
+.secondary-btn,
+.delete-btn {
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* when mouse is over the button, this happens */
+.primary-btn:hover,
+.secondary-btn:hover,
+.delete-btn:hover {
+    transform: translateY(-1px);
+}
+
+.primary-btn {
+    grid-column: 1 / -1;
+    padding: 12px;
+    background-color: var(--accent);
+    font-weight: bold;
+}
+
+.primary-btn:hover {
+    background-color: var(--accent-dark);
+}
+
+.secondary-btn {
+    padding: 9px 10px;
+    background-color: var(--panel-light);
+    border: 1px solid var(--border);
+}
+
+.secondary-btn:hover {
+    background-color: var(--accent-dark);
 }
 
 .hidden {
@@ -88,100 +205,150 @@ h2 {
 }
 
 .error-msg {
-    color: #ff6b6b;
+    color: var(--danger);
+    min-height: 1.2em;
     margin: 0;
     grid-column: 1 / -1;
 }
 
-/* filter tabs */
-
 .filter-tabs {
-    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
 }
 
+/* the tabs at the top of the page */
 .tab {
-    padding: 8px 14px;
-    margin-right: 6px;
-    background-color: #0f3460;
-    color: #eee;
-    border: 1px solid #444;
-    border-radius: 4px;
+    padding: 9px 14px;
+    background-color: var(--panel-light);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 999px;
     cursor: pointer;
 }
 
-.tab.active {
-    background-color: #e94560;
-    border-color: #e94560;
+/* the tab that is currently selected */
+.tab.active,
+.tab:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
 }
 
-/* catalog cards */
-
+/* where all the added media is displayed */
 .catalog-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 18px;
 }
 
+/* individual section for each media that has been added */
 .card {
-    background-color: #16213e;
-    border-radius: 6px;
+    background-color: var(--panel-light);
+    border-radius: 14px;
     overflow: hidden;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.poster-wrap {
+    background-color: #29344e;
+    min-height: 270px;
 }
 
 .card img {
     width: 100%;
-    height: 240px;
+    height: 270px;
     object-fit: cover;
     display: block;
-    background-color: #333;
 }
 
 .card-body {
-    padding: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
 }
 
+/* where the actual content of the card is displayed */
 .card-body h3 {
-    margin: 0 0 6px 0;
-    font-size: 16px;
+    margin-bottom: 0;
+    font-size: 1.05rem;
+    line-height: 1.25;
 }
 
 .card-type {
-    font-size: 11px;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    color: #e94560;
-    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0;
 }
 
-.card-info {
-    font-size: 13px;
-    color: #aaa;
-    margin: 3px 0;
+.card-info,
+.rating-summary {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0;
 }
 
 .stars {
-    color: #ffd700;
-    font-size: 14px;
-    margin: 6px 0;
+    color: var(--gold);
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0;
+}
+
+.rate-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-top: auto;
+    align-items: end;
 }
 
 .delete-btn {
     width: 100%;
-    padding: 7px;
-    margin-top: 8px;
-    background-color: #444;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 9px;
+    margin-top: 2px;
+    background-color: #3d465b;
 }
 
 .delete-btn:hover {
-    background-color: #e94560;
+    background-color: var(--accent);
 }
 
 .empty-msg {
-    color: #888;
+    color: var(--muted);
     text-align: center;
-    padding: 30px;
+    padding: 34px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+}
+
+/* media queries are used to make the website responsive */
+@media (max-width: 720px) {
+    main {
+        padding: 16px;
+    }
+
+    .site-header {
+        padding: 26px 18px;
+    }
+
+    .section-heading,
+    #add-form,
+    .rate-form {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        display: block;
+    }
+
+    .hint {
+        margin-top: 8px;
+    }
 }
